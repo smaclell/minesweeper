@@ -1,7 +1,7 @@
 from django.test import TestCase
 
-from .api import Point, ListGenerator, RandomGenerator, setup_mines
-from .models import Tile, TileState, World
+from ..api import Point, ListGenerator, RandomGenerator, setup_mines
+from ..models import Tile, TileState, World
 
 
 class WorldTestCase(TestCase):
