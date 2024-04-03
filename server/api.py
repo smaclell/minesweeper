@@ -1,12 +1,13 @@
 from collections import namedtuple
-from random import random
+from random import randint
 from .models import World, Tile
 
 Point = namedtuple("Point", ['x', 'y'])
 
 
-def get_neighbours_points(world: World, x: int, y: int) -> list[Point]:
+def get_neighbours_points(world: World, point: Point) -> list[Point]:
     points = []
+    x, y = point
     if (x > 0):
         points.append(Point(x - 1, y))
         if (y > 0):
@@ -43,10 +44,18 @@ class ListGenerator(Generator):
         return self.points.pop()
 
 
-def find_or_create_tile(world: World, x: int, y: int) -> Tile:
-    tile = Tile.objects.filter(world=world, x=x, y=y).first()
+class RandomGenerator(Generator):
+    def generate_point(self, world: World) -> Point:
+        return Point(
+            x=randint(0, world.width - 1),
+            y=randint(0, world.height - 1),
+        )
+
+
+def find_or_create_tile(world: World, point: Point) -> Tile:
+    tile = Tile.objects.filter(world=world, x=point.x, y=point.y).first()
     if tile == None:
-        tile = Tile.objects.create(world=world, x=x, y=y)
+        tile = Tile.objects.create(world=world, x=point.x, y=point.y)
     return tile
 
 
@@ -55,19 +64,19 @@ def setup_mines(world: World, generator: Generator) -> None:
     created = set()
 
     while mine_count > 0:
-        x, y = generator.generate_point(world)
-        if (x, y) in created:
+        point = generator.generate_point(world)
+        if point in created:
             continue
 
-        created.add((x, y))
+        created.add(point)
         mine_count -= 1
 
-        mine = find_or_create_tile(world, x, y)
+        mine = find_or_create_tile(world, point)
         mine.has_mine = True
         mine.save()
 
         # TODO: Is there a more idiomatic way to do this?
-        for point in get_neighbours_points(world, x, y):
-            tile = find_or_create_tile(world, point.x, point.y)
+        for point in get_neighbours_points(world, point):
+            tile = find_or_create_tile(world, point)
             tile.count = tile.count + 1
             tile.save()

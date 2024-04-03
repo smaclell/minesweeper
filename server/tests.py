@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from .api import Point, ListGenerator, setup_mines
+from .api import Point, ListGenerator, RandomGenerator, setup_mines
 from .models import Tile, TileState, World
 
 
@@ -35,3 +35,17 @@ class WorldTestCase(TestCase):
             tile = Tile.objects.get(world=world, x=point.x, y=point.y)
             self.assertEqual(tile.count, 1)
             self.assertEqual(tile.has_mine, False)
+
+    def test_random_world(self):
+        world = World.objects.create(
+            slug="random", width=10, height=10, mine_count=5)
+
+        generator = RandomGenerator()
+        setup_mines(world, generator)
+
+        mines = Tile.objects.filter(world=world, has_mine=True)
+        self.assertEqual(mines.count(), world.mine_count)
+
+        for mine in mines:
+            self.assertEqual(mine.has_mine, True)
+            self.assertEqual(mine.state, TileState.HIDDEN)
