@@ -51,6 +51,8 @@ class RandomGenerator(Generator):
             y=randint(0, world.height - 1),
         )
 
+# TODO: Is there a more idiomatic way to find/create or find/update?
+
 
 def find_or_create_tile(world: World, point: Point) -> Tile:
     tile = Tile.objects.filter(world=world, x=point.x, y=point.y).first()
@@ -75,7 +77,6 @@ def setup_mines(world: World, generator: Generator) -> None:
         mine.has_mine = True
         mine.save()
 
-        # TODO: Is there a more idiomatic way to do this?
         for point in get_neighbours_points(world, point):
             tile = find_or_create_tile(world, point)
             tile.count = tile.count + 1
