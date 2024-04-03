@@ -21,20 +21,17 @@ class WorldTestCase(TestCase):
             self.assertEqual(mine.has_mine, True)
             self.assertEqual(mine.state, TileState.HIDDEN)
 
-        for point in [Point(0, 1)]:
-            tile = Tile.objects.get(world=world, x=point.x, y=point.y)
-            self.assertEqual(tile.count, 3)
-            self.assertEqual(tile.has_mine, False)
+        point_counts = {
+            3: [Point(0, 1)],
+            2: [Point(1, 0), Point(1, 2)],
+            1: [Point(2, 0), Point(2, 1), Point(2, 2), Point(1, 3), Point(0, 3)],
+        }
 
-        for point in [Point(1, 0), Point(1, 2)]:
-            tile = Tile.objects.get(world=world, x=point.x, y=point.y)
-            self.assertEqual(tile.count, 2)
-            self.assertEqual(tile.has_mine, False)
-
-        for point in [Point(2, 0), Point(2, 1), Point(2, 2), Point(1, 3), Point(0, 3)]:
-            tile = Tile.objects.get(world=world, x=point.x, y=point.y)
-            self.assertEqual(tile.count, 1)
-            self.assertEqual(tile.has_mine, False)
+        for count, points in point_counts.items():
+            for point in points:
+                tile = Tile.objects.get(world=world, x=point.x, y=point.y)
+                self.assertEqual(tile.count, count)
+                self.assertEqual(tile.has_mine, False)
 
     def test_random_world(self):
         world = World.objects.create(
