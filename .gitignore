@@ -1,0 +1,40 @@
+# Django specific
+*.pyc
+__pycache__/
+.django_admin_commands
+.env  # Add this if you're using environment variables
+local_settings.py
+
+# React specific
+node_modules/
+public/build/
+
+# Virtual environment
+venv/
+.venv/
+
+# General
+*.log
+.idea/
+*.egg-info/
+coverage/
+requirements.txt
+# Consider using Pipfile/Pipfile.lock instead
+
+# IDE specific (adjust based on your IDE)
+.vscode/
+
+# Tests
+# You might want to version control your tests,
+# uncomment these lines if you prefer not to
+# __init__.py$
+# *.py$
+
+# Database files (if applicable)
+db.sqlite3
+
+# Temporary django files
+.project
+
+# OS specific
+.DS_Store
