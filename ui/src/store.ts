@@ -38,6 +38,7 @@ type StoreData = {
 
 // TODO: Prevent the api from handling existing items
 // TODO: Reload the world from the server
+// TODO: Updated_at on the world
 
 export function createWorldStore(
   updater: (state: TileState.Flag | TileState.Shown, x: number, y: number) => Promise<TileData>,
@@ -59,6 +60,33 @@ export function createWorldStore(
           // TODO: Can this be cheated? The backend is still the source of truth
           if ((state.cleared + state.mine_count) >= state.width * state.height) {
             state.state = WorldState.Won;
+          }
+
+          // Auto expand if there are no nearby mines, stop at the edges or if already shown
+          if (tile.count === 0) {
+            const { update, width, height } = get();
+            const check = (x: number, y: number) => {
+              if (x < 0 || x >= width || y < 0 || y >= height) {
+                return;
+              }
+
+              if (`${x},${y}` in get().tiles) {
+                return;
+              };
+
+              update(TileState.Shown, x, y);
+            }
+
+            check(x - 1, y - 1);
+            check(x - 1, y);
+            check(x - 1, y + 1);
+
+            check(x, y - 1);
+            check(x, y + 1);
+
+            check(x + 1, y + 1);
+            check(x + 1, y);
+            check(x + 1, y + 1);
           }
         }
       }));
