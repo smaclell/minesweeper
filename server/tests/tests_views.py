@@ -55,6 +55,32 @@ class WorldListTestCase(TestCase):
         ).count()
         self.assertGreater(tiles_created, mine_count)
 
+    def test_using_the_simple_debug_flag(self):
+        mine_count = 3
+
+        response = self.client.post('/api/worlds/', {
+            'width': 10,
+            'height': 10,
+            'mine_count': mine_count,
+            'slug': 'simple-is-good',
+            'debug_flag': 'simple'
+        }, format='json')
+
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.data['state'], WorldState.PLAYING)
+        self.assertEqual(response.data['mine_count'], mine_count)
+
+        mines_created = Tile.objects.filter(
+            world_id=response.data['id'],
+            has_mine=True,
+        ).count()
+        self.assertEqual(mines_created, mine_count)
+
+        tiles_created = Tile.objects.filter(
+            world_id=response.data['id'],
+        ).count()
+        self.assertGreater(tiles_created, mine_count)
+
     def test_cannot_create_a_duplicate_world(self):
         mine_count = 3
 

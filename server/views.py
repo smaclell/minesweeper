@@ -4,7 +4,7 @@ from django.http import Http404
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from .api import ListGenerator, RandomGenerator, setup_mines
+from .api import ListGenerator, Point, RandomGenerator, setup_mines
 from .models import Tile, TileState, World, WorldState
 from .serializers import TileSerializer, WorldSerializer
 
@@ -26,9 +26,9 @@ class WorldList(APIView):
         if debug_flags == 'simple':
             generator = ListGenerator(
                 [
-                    (0, 0),
-                    (1, 1),
-                    (0, 2),
+                    Point(0, 0),
+                    Point(1, 1),
+                    Point(0, 2),
                 ]
             )
 
