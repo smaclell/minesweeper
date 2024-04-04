@@ -1,28 +1,29 @@
 import { create } from 'zustand';
 import { produce } from 'immer';
 
-enum WorldState {
+export enum WorldState {
   Loading = 1,
   Playing = 2,
   Won = 3,
   Lost = 4,
 }
 
-enum TileState {
+export enum TileState {
   Hidden = 1,
   Shown = 2,
   Explosion = 3,
   Flag = 4,
 }
 
-type TileData = {
+export type TileData = {
   state: TileState;
   x: number;
   y: number;
   count: number;
 }
 
-type WorldData = {
+export type WorldData = {
+  slug: string;
   state: WorldState;
   width: number;
   height: number;
@@ -38,8 +39,10 @@ type StoreData = {
 
 // TODO: Reload the world from the server
 
+export type Store = ReturnType<typeof createWorldStore>;
+
 export function createWorldStore(
-  updater: (state: TileState.Flag | TileState.Shown, x: number, y: number) => Promise<TileData>,
+  updater: (state: TileState.Flag | TileState.Shown, slug: string, x: number, y: number) => Promise<TileData>,
   world: WorldData,
   tiles: Record<string, TileData> = {},
 ) {
@@ -47,7 +50,10 @@ export function createWorldStore(
     ...world,
     tiles,
     async update(state, x, y) {
-      const tile = await updater(state, x, y);
+      const { update, width, height, slug } = get();
+      const tile = await updater(state, slug, x, y);
+
+      let expand = false;
       set(produce(state => {
         state.tiles[`${x},${y}`] = tile;
         if (tile.state === TileState.Explosion) {
@@ -62,32 +68,37 @@ export function createWorldStore(
 
           // Auto expand if there are no nearby mines, stop at the edges or if already shown
           if (tile.count === 0) {
-            const { update, width, height } = get();
-            const check = (x: number, y: number) => {
-              if (x < 0 || x >= width || y < 0 || y >= height) {
-                return;
-              }
-
-              if (`${x},${y}` in get().tiles) {
-                return;
-              };
-
-              update(TileState.Shown, x, y);
-            }
-
-            check(x - 1, y - 1);
-            check(x - 1, y);
-            check(x - 1, y + 1);
-
-            check(x, y - 1);
-            check(x, y + 1);
-
-            check(x + 1, y + 1);
-            check(x + 1, y);
-            check(x + 1, y + 1);
+            expand = true;
           }
         }
       }));
+
+      if (!expand) {
+        return;
+      }
+
+      const check = (x: number, y: number) => {
+        if (x < 0 || x >= width || y < 0 || y >= height) {
+          return;
+        }
+
+        if (`${x},${y}` in get().tiles) {
+          return;
+        };
+
+        update(TileState.Shown, x, y);
+      }
+
+      check(x - 1, y - 1);
+      check(x - 1, y);
+      check(x - 1, y + 1);
+
+      check(x, y - 1);
+      check(x, y + 1);
+
+      check(x + 1, y + 1);
+      check(x + 1, y);
+      check(x + 1, y + 1);
     }
   }));
 

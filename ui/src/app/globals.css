@@ -31,3 +31,72 @@ body {
     text-wrap: balance;
   }
 }
+
+
+
+/* TODO: Finalize the colours */
+/* Source: https://www.color-hex.com/color-palette/100312 */
+
+/* Additional styling to size the grid is applied inline */
+.world {
+  display: grid;
+  place-items: center;
+
+  width: fit-content;
+  height: fit-content;
+}
+
+.tile {
+  text-align: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: 1rem;
+  line-height: calc(2rem - 8px);
+  background-color: #3b3b3b;
+  border: #222222 4px inset;
+  transition: all 0.2s ease-in-out;
+}
+
+.tile.unknown, .tile.flag {
+  background-color: #222222;
+  border: #141414 4px outset;
+}
+
+.tile.unknown, .tile.flag {
+  cursor: pointer;
+}
+
+.tile[data-count="8"] {
+  color: #FF0000;
+}
+.tile[data-count="7"] {
+  color: #FF3100;
+}
+.tile[data-count="6"] {
+  color: #FF6200;
+}
+.tile[data-count="5"] {
+  color: #FF9400;
+}
+.tile[data-count="4"] {
+  color: #FFC500;
+}
+.tile[data-count="3"] {
+  color: #FFFE00;
+}
+.tile[data-count="2"] {
+  color: #D5FF00;
+}
+.tile[data-count="1"] {
+  color: #A4FF00;
+}
+
+.skeleton {
+  animation: fadeOut ease-in-out 10s alternate-reverse infinite;
+  opacity: 1;
+}
+
+@keyframes fadeOut {
+  from { opacity: 1; }
+  to { opacity: 0.8; }
+}
