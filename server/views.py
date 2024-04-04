@@ -37,7 +37,7 @@ class WorldList(APIView):
             world.state = WorldState.PLAYING
             world.save(force_update=True)
 
-        # TODO: Should I reuse the same serializer
+        # TODO: Can I reuse the same serializer?
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -62,7 +62,7 @@ class TileList(APIView):
         except World.DoesNotExist:
             world = None
 
-        # TODO: Should this be using the serializer to access fields? Can we consolidate the validation?
+        # TODO: Can this use the serializer to access fields? Can we consolidate the validation against the world?
         x = request.data['x']
         y = request.data['y']
         state = request.data['state']
