@@ -1,5 +1,5 @@
 'use client'
-import { useCallback } from "react";
+import { useCallback } from 'react';
 import { generate } from 'random-words';
 
 export default function Home() {
