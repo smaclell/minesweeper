@@ -1,7 +1,7 @@
 from enum import IntEnum
 # from django.contrib.auth.models import AbstractUser
 from django.db import models
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 
 MAX_WIDTH = 100
 MAX_HEIGHT = 100
@@ -34,7 +34,12 @@ class TileState(IntEnum):
 
 
 class World(models.Model):
-    slug = models.CharField(max_length=255, unique=True)
+    slug = models.CharField(max_length=255, unique=True, validators=[
+        RegexValidator(
+            r'^[a-z]+-[a-z]+-[a-z]+$',
+            message='Only 3 lowercase words without special characters joined with dashes is allowed, i.e. turkey-bacon-sandwich.',
+        ),
+    ])
     state = models.IntegerField(
         choices=WorldState.choices(), default=WorldState.LOADING)
     created_at = models.DateTimeField(auto_now_add=True, blank=True)

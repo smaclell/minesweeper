@@ -7,7 +7,7 @@ from ..models import Tile, TileState, World
 class WorldTestCase(TestCase):
     def test_creating_a_basic_world(self):
         world = World.objects.create(
-            slug="test", width=10, height=10, mine_count=3)
+            slug="test-basic-worlds", width=10, height=10, mine_count=3)
 
         mines = [Point(0, 0), Point(1, 1), Point(0, 2)]
         generator = ListGenerator(mines)
@@ -35,7 +35,7 @@ class WorldTestCase(TestCase):
 
     def test_random_world(self):
         world = World.objects.create(
-            slug="random", width=10, height=10, mine_count=5)
+            slug="random-worlds-created", width=10, height=10, mine_count=5)
 
         generator = RandomGenerator()
         setup_mines(world, generator)
