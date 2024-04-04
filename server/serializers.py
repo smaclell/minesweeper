@@ -5,12 +5,13 @@ from server.models import Tile, TileState, World
 
 
 class WorldSerializer(serializers.ModelSerializer):
+    # TODO: How do I make the slug as being create only?
     state = serializers.ReadOnlyField()
     cleared = serializers.ReadOnlyField()
 
     class Meta:
         model = World
-        fields = ['id', 'width', 'height',
+        fields = ['id', 'width', 'height', 'slug',
                   'mine_count', 'state', 'cleared']
 
 
