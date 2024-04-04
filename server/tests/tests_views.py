@@ -129,36 +129,88 @@ class TileListTestCase(TestCase):
             'state': TileState.SHOWN,
         }, format='json')
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 202)
         self.assertEqual(response.data['state'], TileState.SHOWN)
         self.assertEqual(response.data['count'], 0)
         self.assertEqual('has_mine' in response.data, False)
 
-    def test_revealing_a_mine(self):
+    def test_showing_a_tile_twice(self):
+        response = self.client.post('/api/worlds/test-basic-tiles/tiles/', {
+            'x': 4,
+            'y': 4,
+            'state': TileState.SHOWN,
+        }, format='json')
+
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.data['state'], TileState.SHOWN)
+        self.assertEqual(response.data['count'], 0)
+        self.assertEqual('has_mine' in response.data, False)
+
+        response = self.client.post('/api/worlds/test-basic-tiles/tiles/', {
+            'x': 4,
+            'y': 4,
+            'state': TileState.SHOWN,
+        }, format='json')
+
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.data['state'], TileState.SHOWN)
+        self.assertEqual(response.data['count'], 0)
+        self.assertEqual('has_mine' in response.data, False)
+
+        updated_world = World.objects.get(id=self.world.id)
+        self.assertEqual(updated_world.cleared, self.world.cleared + 1)
+
+    def test_showing_a_mine(self):
         response = self.client.post('/api/worlds/test-basic-tiles/tiles/', {
             'x': 1,
             'y': 1,
             'state': TileState.SHOWN,
         }, format='json')
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 202)
         self.assertEqual(response.data['state'], TileState.EXPLOSION)
         self.assertEqual('has_mine' in response.data, False)
 
         updated_world = World.objects.get(id=self.world.id)
         self.assertEqual(updated_world.state, WorldState.LOST)
 
-    def test_revealing_near_a_mine(self):
+    def test_showing_near_a_mine(self):
         response = self.client.post('/api/worlds/test-basic-tiles/tiles/', {
             'x': 1,
             'y': 0,
             'state': TileState.SHOWN,
         }, format='json')
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 202)
         self.assertEqual(response.data['state'], TileState.SHOWN)
         self.assertEqual(response.data['count'], 2)
         self.assertEqual('has_mine' in response.data, False)
+
+    def test_flagging_then_showing(self):
+        response = self.client.post('/api/worlds/test-basic-tiles/tiles/', {
+            'x': 1,
+            'y': 2,
+            'state': TileState.FLAG,
+        }, format='json')
+
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.data['state'], TileState.FLAG)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual('has_mine' in response.data, False)
+
+        response = self.client.post('/api/worlds/test-basic-tiles/tiles/', {
+            'x': 1,
+            'y': 2,
+            'state': TileState.SHOWN,
+        }, format='json')
+
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.data['state'], TileState.SHOWN)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual('has_mine' in response.data, False)
+
+        updated_world = World.objects.get(id=self.world.id)
+        self.assertEqual(updated_world.cleared, self.world.cleared + 1)
 
     def test_flagging_a_mine(self):
         response = self.client.post('/api/worlds/test-basic-tiles/tiles/', {
@@ -167,7 +219,7 @@ class TileListTestCase(TestCase):
             'state': TileState.FLAG,
         }, format='json')
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 202)
         self.assertEqual(response.data['state'], TileState.FLAG)
         self.assertEqual('has_mine' in response.data, False)
 
@@ -181,7 +233,7 @@ class TileListTestCase(TestCase):
             'state': TileState.SHOWN,
         }, format='json')
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 202)
 
         updated_world = World.objects.get(id=self.world.id)
         self.assertEqual(updated_world.state, WorldState.WON)

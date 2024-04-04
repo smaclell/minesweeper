@@ -36,9 +36,7 @@ type StoreData = {
   update(state: TileState.Flag | TileState.Shown, x: number, y: number): Promise<void>;
 }
 
-// TODO: Prevent the api from handling existing items
 // TODO: Reload the world from the server
-// TODO: Updated_at on the world
 
 export function createWorldStore(
   updater: (state: TileState.Flag | TileState.Shown, x: number, y: number) => Promise<TileData>,

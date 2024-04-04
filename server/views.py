@@ -1,6 +1,7 @@
 from sqlite3 import IntegrityError as SqliteIntegrityError
 from django.db import IntegrityError, transaction
 from django.http import Http404
+from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -13,6 +14,9 @@ class WorldList(APIView):
     def post(self, request, format=None):
         serializer = WorldSerializer(data=request.data)
         if not serializer.is_valid():
+            if 'slug' in serializer.errors and any(e.code == 'unique' for e in serializer.errors[
+                    'slug']):
+                return Response(serializer.errors, status.HTTP_409_CONFLICT)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         with transaction.atomic():
@@ -77,7 +81,9 @@ class TileList(APIView):
                 y=y,
             ).first()
 
+            shown = False
             if tile == None:
+                shown = True
                 tile = Tile(
                     world=world,
                     x=x,
@@ -87,14 +93,16 @@ class TileList(APIView):
             elif tile.has_mine and state == TileState.SHOWN:
                 tile.state = TileState.EXPLOSION
                 world.state = WorldState.LOST
-            else:
+            elif tile.state == TileState.HIDDEN or tile.state == TileState.FLAG:
                 tile.state = state
+                shown = state == TileState.SHOWN
 
-            if tile.state == TileState.SHOWN:
+            if shown:
                 world.cleared += 1
                 if (world.cleared + world.mine_count) >= (world.width * world.height):
                     world.state = WorldState.WON
 
+            world.updated_at = timezone.now()
             tile.save()
             world.save()
-            return Response(TileSerializer(tile).data, status=status.HTTP_201_CREATED)
+            return Response(TileSerializer(tile).data, status=status.HTTP_202_ACCEPTED)
