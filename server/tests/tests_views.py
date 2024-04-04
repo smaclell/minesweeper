@@ -5,6 +5,27 @@ from ..api import ListGenerator, Point, setup_mines
 from ..models import Tile, TileState, World, WorldState
 
 
+class WorldDetailTestCase(TestCase):
+    def setUp(self):
+        self.client = APIClient()
+        self.world = World.objects.create(
+            slug="test-basic-details", width=10, height=10, mine_count=3)
+
+    def test_getting_a_basic_world(self):
+        response = self.client.get('/api/worlds/test-basic-details/')
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data['width'], 10)
+        self.assertEqual(response.data['height'], 10)
+        self.assertEqual(response.data['state'], self.world.state)
+        self.assertEqual(response.data['mine_count'], 3)
+
+    def test_getting_a_basic_world(self):
+        response = self.client.get('/api/worlds/test-not-found/')
+
+        self.assertEqual(response.status_code, 404)
+
+
 class WorldListTestCase(TestCase):
     def setUp(self):
         self.client = APIClient()
@@ -21,7 +42,7 @@ class WorldListTestCase(TestCase):
 
         self.assertEqual(response.status_code, 201)
         self.assertEqual(response.data['state'], WorldState.PLAYING)
-        self.assertEqual(response.data['mine_count'], 3)
+        self.assertEqual(response.data['mine_count'], mine_count)
 
         mines_created = Tile.objects.filter(
             world_id=response.data['id'],

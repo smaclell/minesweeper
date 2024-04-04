@@ -41,6 +41,16 @@ class WorldList(APIView):
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
+class WorldDetail(APIView):
+    def get(self, request, slug, format=None):
+        try:
+            world = World.objects.get(slug=slug)
+            return Response(WorldSerializer(world).data, status=status.HTTP_200_OK)
+
+        except World.DoesNotExist:
+            raise Http404
+
+
 class TileList(APIView):
     def post(self, request, slug, format=None):
         serializer = TileSerializer(data=request.data)

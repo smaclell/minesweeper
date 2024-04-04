@@ -16,10 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .views import WorldList, TileList
+from .views import WorldDetail, WorldList, TileList
 
 urlpatterns = [
     path('api/worlds/', WorldList.as_view()),
+    path('api/worlds/<str:slug>/', WorldDetail.as_view()),
     path('api/worlds/<str:slug>/tiles/', TileList.as_view()),
     path('admin/', admin.site.urls),
 ]
