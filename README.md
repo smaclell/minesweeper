@@ -16,6 +16,12 @@ Here are some of the more interesting files:
 
 There is so much more I would like to learn and do! Check out the different `TODO` comments for examples. Any labelled (scope) or (refactor) highlight changes I would like to make.
 
+My top priories would be:
+
+* Switching to a more robust database to improve performance/interactivity
+* Making the "clearing" smoother to ensure it does not block user interactions
+* Change serving pages so the routes could be /world/cool-unique-slug instead of /world?slug=okay-i-guess
+
 ## Running the code
 
 First, run the backend:
