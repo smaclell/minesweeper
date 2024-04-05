@@ -1,19 +1,20 @@
 
 'use client'
 import React, { useEffect, useMemo, useState } from 'react';
-import { loadWorld, updateTile } from '../../api';
+import { loadWorld, loadTiles, updateTile } from '../../api';
 import { WorldData, WorldState, createWorldStore } from '../../store';
 import { useStore } from 'zustand';
 import Tile from './tile';
-
-function Grid() {
-
-}
 
 function WorldView({ world }: { world: WorldData }) {
   const store = useMemo(() => {
     return createWorldStore(updateTile, world);
   }, [world]);
+
+  useEffect(() => {
+    const { reload } = store.getState()
+    reload(loadTiles)
+  }, [store]);
 
   // Memoize and pass it down
   const { tiles, update } = useStore(store);
@@ -81,12 +82,10 @@ export default function WorldPage() {
     }
 
     let accept = true;
-    loadWorld(slug).then(({ world }) => {
-      if (!accept) {
-        return;
+    loadWorld(slug).then((world) => {
+      if (accept) {
+        setWorld(world);
       }
-
-      setWorld(world);
     });
 
     return () => {

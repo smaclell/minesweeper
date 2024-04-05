@@ -34,10 +34,9 @@ export type WorldData = {
 type StoreData = {
   // TODO: Does this violate the requirements? I want to cache the state of the world
   tiles: Record<string, TileData>;
+  reload(loader: (slug: string, url?: string | null) => Promise<{ next: string | null; results: TileData[] }>): Promise<void>;
   update(state: TileState.Flag | TileState.Shown, x: number, y: number): Promise<void>;
 }
-
-// TODO: Reload the world from the server
 
 export type Store = ReturnType<typeof createWorldStore>;
 
@@ -49,6 +48,19 @@ export function createWorldStore(
   const store = create<WorldData & StoreData>((set, get) => ({
     ...world,
     tiles,
+    async reload(loader) {
+      let next: string | null | undefined;
+      let results: TileData[];
+      do {
+        ({ next, results } = await loader(world.slug, next));
+
+        set(produce(state => {
+          for (const tile of results) {
+            state.tiles[`${tile.x},${tile.y}`] = tile;
+          }
+        }));
+      } while(next);
+    },
     async update(state, x, y) {
       const { update, width, height, slug } = get();
       const tile = await updater(state, slug, x, y);

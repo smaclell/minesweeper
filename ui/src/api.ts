@@ -1,6 +1,6 @@
 // import 'unfetch/polyfill';
 import { generate } from 'random-words';
-import { TileState } from './store';
+import { TileData, TileState, WorldData } from './store';
 
 type CreateRequest = {
   slug: string;
@@ -14,7 +14,7 @@ type CreateRequest = {
 // TODO: Retries
 // TODO: Assert the right data was shared
 
-export async function createWorld(width: number, height: number, mines: number) {
+export async function createWorld(width: number, height: number, mines: number): Promise<WorldData> {
   let retries = 5;
 
   const body: CreateRequest = {
@@ -59,7 +59,7 @@ export async function createWorld(width: number, height: number, mines: number) 
   throw new Error('Failed to create world after 5 tries');
 }
 
-export async function loadWorld(slug: string) {
+export async function loadWorld(slug: string): Promise<WorldData> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/worlds/${slug}/`, {
     method: 'GET',
     headers: {
@@ -69,13 +69,37 @@ export async function loadWorld(slug: string) {
 
   if (response.ok) {
     const world = await response.json();
-    return { world };
+    return world;
   }
 
   throw new Error('Failed to load world');
 }
 
-export async function updateTile(state: TileState.Flag | TileState.Shown, slug: string, x: number, y: number) {
+export async function loadTiles(slug: string, url: string | null = 'initial'): Promise<{ next: string | null; results: TileData[] }> {
+  if (!url) {
+    return { next: null, results: [] };
+  }
+
+  if (url === 'initial') {
+    url = `${process.env.NEXT_PUBLIC_API_BASE_URL}/api/worlds/${slug}/tiles/`;
+  }
+
+  const response = await fetch(url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+  });
+
+  if (response.ok) {
+    const { next, results } = await response.json();
+    return { next, results };
+  }
+
+  throw new Error('Failed to load tiles');
+}
+
+export async function updateTile(state: TileState.Flag | TileState.Shown, slug: string, x: number, y: number): Promise<TileData> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/worlds/${slug}/tiles/`, {
     method: 'POST',
     headers: {

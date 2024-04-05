@@ -1,9 +1,12 @@
 from sqlite3 import IntegrityError as SqliteIntegrityError
+from django.core.paginator import Paginator
 from django.db import IntegrityError, transaction
 from django.http import Http404
+from django.db.models import Q
 from django.utils import timezone
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.pagination import CursorPagination
 from rest_framework import status
 from .api import ListGenerator, Point, RandomGenerator, setup_mines
 from .models import Tile, TileState, World, WorldState
@@ -56,6 +59,36 @@ class WorldDetail(APIView):
 
 
 class TileList(APIView):
+    pagination_class = CursorPagination
+
+    # TODO: How do I do the pagination right?
+    # TODO: Test this method
+    def get(self, request, slug, format=None):
+        try:
+            world = World.objects.get(slug=slug)
+        except World.DoesNotExist:
+            world = None
+
+        if world == None:
+            raise Http404
+
+        queryset = Tile.objects.filter(world=world).filter(
+            Q(state=TileState.SHOWN) | Q(state=TileState.EXPLOSION)
+        )
+
+        paginator = CursorPagination()
+        paginator.ordering = 'id'
+        paginator.reverse = True
+
+        paginated_queryset = paginator.paginate_queryset(
+            queryset, request, view=self)
+
+        serializer = TileSerializer(paginated_queryset, many=True)
+        return Response({
+            'next': paginator.get_next_link(),
+            'results': serializer.data
+        }, status=status.HTTP_200_OK)
+
     def post(self, request, slug, format=None):
         serializer = TileSerializer(data=request.data)
         if not serializer.is_valid():
