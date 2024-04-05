@@ -44,4 +44,6 @@ npm install
 npm run dev
 ```
 
+Or want an even better experience? Use `docker compose up`
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.

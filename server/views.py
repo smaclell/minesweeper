@@ -95,7 +95,7 @@ class TileList(APIView):
         # TODO: (fix) ensure postgres does not fail
         with transaction.atomic():
             try:
-                world = World.objects.get(slug=slug)
+                world = World.objects.select_for_update().get(slug=slug)
             except World.DoesNotExist:
                 world = None
 
@@ -107,7 +107,7 @@ class TileList(APIView):
             if world == None or world.state != WorldState.PLAYING or x < 0 or y < 0 or x >= world.width or y >= world.height:
                 raise Http404
 
-            tile = Tile.objects.filter(
+            tile = Tile.objects.select_for_update().filter(
                 world=world,
                 x=x,
                 y=y,
