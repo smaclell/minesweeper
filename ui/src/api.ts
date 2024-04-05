@@ -97,7 +97,7 @@ export async function loadTiles(slug: string, url: string | null = 'initial'): P
   throw new Error('Failed to load tiles');
 }
 
-export async function updateTile(state: TileState.Flag | TileState.Shown, slug: string, x: number, y: number): Promise<TileData> {
+export async function updateTile(state: TileState.Flag | TileState.Shown, slug: string, x: number, y: number): Promise<TileData | undefined> {
   const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/worlds/${slug}/tiles/`, {
     method: 'POST',
     headers: {
@@ -109,6 +109,10 @@ export async function updateTile(state: TileState.Flag | TileState.Shown, slug: 
   if (response.ok) {
     const tile = response.json();
     return tile;
+  }
+
+  if (response.status === 404) {
+    return undefined;
   }
 
   throw new Error('Failed to update tile');

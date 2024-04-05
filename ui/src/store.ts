@@ -63,6 +63,9 @@ export function createWorldStore(
     async update(state, x, y) {
       const { update, width, height, slug } = get();
       const tile = await updater(state, slug, x, y);
+      if (!tile) {
+        return;
+      }
 
       let expand = false;
       set(produce(state => {
