@@ -50,7 +50,7 @@ export default React.memo(function Tile({
 
   const clicking = useRef(false);
 
-  // TODO: (scope) Ensure tiles are accessible
+  // TODO: (scope) Ensure tiles are accessible via screen reader
   const state = data?.state ?? TileState.Hidden;
   const { className, content } = lookup[state];
 

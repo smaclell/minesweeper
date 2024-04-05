@@ -122,6 +122,7 @@ export function createWorldStore(
           }));
         } while(next);
       },
+      // TODO: (scope) queue updates to prioritize user inputs over automatically clearing the board
       async update(state, x, y) {
         return innerUpdate(state, x, y, true);
       },

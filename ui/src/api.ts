@@ -1,4 +1,3 @@
-// import 'unfetch/polyfill';
 import { generate } from 'random-words';
 import { TileData, TileState, WorldData } from './store';
 
@@ -10,8 +9,9 @@ type CreateRequest = {
   debug_flags?: string;
 };
 
-// TODO: (stability) Error handling and retries
 // TODO: (scope) Assert the right data was shared
+// TODO: (refactor) This file has lots of repeated patterns, consider using a fetch wrapper
+// TODO: (refactor) Consider further improving the handling and retries
 
 export async function createWorld(width: number, height: number, mines: number): Promise<WorldData> {
   let retries = 5;

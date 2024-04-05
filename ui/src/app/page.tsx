@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { createWorld } from '@/api';
 
-// TODO: (scope) update to have simple clean routes
+// TODO: (refactor) update to have simple clean routes
 
 export default function Home() {
   const router = useRouter();

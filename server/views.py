@@ -12,15 +12,17 @@ from .api import ListGenerator, Point, RandomGenerator, setup_mines
 from .models import Tile, TileState, World, WorldState
 from .serializers import TileSerializer, WorldSerializer
 
+# TODO: (refactor) These views are quite large. Consider moving more to the API or looking for patterns
+
 
 class WorldList(APIView):
     def post(self, request, format=None):
         serializer = WorldSerializer(data=request.data)
         if not serializer.is_valid():
-            if 'slug' in serializer.errors and any(e.code == 'unique' for e in serializer.errors[
-                    'slug']):
-                return Response(serializer.errors, status.HTTP_409_CONFLICT)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            errors = serializer.errors
+            if 'slug' in errors and any(e.code == 'unique' for e in errors['slug']):
+                return Response(errors, status.HTTP_409_CONFLICT)
+            return Response(errors, status=status.HTTP_400_BAD_REQUEST)
 
         with transaction.atomic():
             try:
@@ -34,7 +36,6 @@ class WorldList(APIView):
             mines = [Point(0, 0), Point(1, 1), Point(0, 2)]
             generator = ListGenerator(mines)
             world.mine_count = len(mines)
-            world.save()
 
         with transaction.atomic():
             setup_mines(world, generator)
@@ -59,7 +60,7 @@ class TileList(APIView):
     pagination_class = CursorPagination
 
     # TODO: (learning) How do I do the pagination right?
-    # TODO: (scope) Test this method
+    # TODO: (testing) Test this method
     def get(self, request, slug, format=None):
         try:
             world = World.objects.get(slug=slug)
@@ -133,7 +134,7 @@ class TileList(APIView):
                 else:
                     tile.state = TileState.FLAG if tile.state == TileState.HIDDEN else TileState.HIDDEN
 
-            # TODO: (scope) Add more tests around this state to ensure cleared only changes when expected
+            # TODO: (testing) Add more tests around this state to ensure cleared only changes when expected
             if shown:
                 world.cleared += 1
                 if (world.cleared + world.mine_count) >= (world.width * world.height):

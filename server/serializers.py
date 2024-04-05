@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from server.models import Tile, TileState, World
 
-# TODO: (choice) Should we convert the enums to strings and back?
+# TODO: (refactor) Should we convert the enums to strings and back?
 
 
 class WorldSerializer(serializers.ModelSerializer):
