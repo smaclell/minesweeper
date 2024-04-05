@@ -1,11 +1,10 @@
 from rest_framework import serializers
 from server.models import Tile, TileState, World
 
-# TODO: Should we convert the enums to strings and back?
+# TODO: (choice) Should we convert the enums to strings and back?
 
 
 class WorldSerializer(serializers.ModelSerializer):
-    # TODO: How do I make the slug as being create only?
     state = serializers.ReadOnlyField()
     cleared = serializers.ReadOnlyField()
 

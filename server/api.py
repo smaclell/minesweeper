@@ -51,7 +51,7 @@ class RandomGenerator(Generator):
             y=randint(0, world.height - 1),
         )
 
-# TODO: Is there a more idiomatic way to find/create or find/update?
+# TODO: (learning) Is there a more idiomatic way to find/create or find/update?
 
 
 def find_or_create_tile(world: World, point: Point) -> Tile:

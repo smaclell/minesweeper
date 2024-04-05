@@ -10,9 +10,8 @@ type CreateRequest = {
   debug_flags?: string;
 };
 
-// TODO: Error handling
-// TODO: Retries
-// TODO: Assert the right data was shared
+// TODO: (stability) Error handling and retries
+// TODO: (scope) Assert the right data was shared
 
 export async function createWorld(width: number, height: number, mines: number): Promise<WorldData> {
   let retries = 5;
@@ -46,7 +45,6 @@ export async function createWorld(width: number, height: number, mines: number):
 
     if (!response.ok && response.status === 409) {
       retries -= 1;
-      // TODO: Sleep?
     } else if (response.ok) {
       const world = await response.json();
       return world;

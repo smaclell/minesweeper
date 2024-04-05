@@ -44,7 +44,7 @@ class WorldList(APIView):
             world.state = WorldState.PLAYING
             world.save(force_update=True)
 
-        # TODO: Can I reuse the same serializer?
+        # TODO: (learning) Can I reuse the same serializer?
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
@@ -61,8 +61,8 @@ class WorldDetail(APIView):
 class TileList(APIView):
     pagination_class = CursorPagination
 
-    # TODO: How do I do the pagination right?
-    # TODO: Test this method
+    # TODO: (learning) How do I do the pagination right?
+    # TODO: (scope) Test this method
     def get(self, request, slug, format=None):
         try:
             world = World.objects.get(slug=slug)
@@ -99,7 +99,7 @@ class TileList(APIView):
         except World.DoesNotExist:
             world = None
 
-        # TODO: Can this use the serializer to access fields? Can we consolidate the validation against the world?
+        # TODO: (learning) Can this use the serializer to access fields? Can we consolidate the validation against the world?
         x = request.data['x']
         y = request.data['y']
         state = request.data['state']
@@ -107,6 +107,7 @@ class TileList(APIView):
         if world == None or world.state != WorldState.PLAYING or x < 0 or y < 0 or x >= world.width or y >= world.height:
             raise Http404
 
+        # TODO: (fix) ensure postgres does not fail
         with transaction.atomic():
             tile = Tile.objects.filter(
                 world=world,
@@ -126,11 +127,14 @@ class TileList(APIView):
             elif tile.has_mine and state == TileState.SHOWN:
                 tile.state = TileState.EXPLOSION
                 world.state = WorldState.LOST
+
+            # TODO: (fix) Allow unflagging
             elif tile.state == TileState.HIDDEN or tile.state == TileState.FLAG:
                 tile.state = state
                 shown = state == TileState.SHOWN
 
-            # TODO: Add more tests around this state to ensure cleared only changes when expected
+            # TODO: (fix) Ensure you can win or lose
+            # TODO: (scope) Add more tests around this state to ensure cleared only changes when expected
             if shown:
                 world.cleared += 1
                 if (world.cleared + world.mine_count) >= (world.width * world.height):

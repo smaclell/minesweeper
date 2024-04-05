@@ -29,7 +29,7 @@ class TileState(IntEnum):
     def choices(cls):
         return [(key.value, key.name) for key in cls]
 
-# TODO: I want users to be able to own worlds and maybe invite others to play
+# TODO: (scope) I want users to be able to own worlds and maybe invite others to play
 #       Let's leave it for now and I can add if I have time. In reading about authentication in Django, I was not fully sure how it worked.
 
 

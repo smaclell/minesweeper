@@ -32,7 +32,6 @@ export type WorldData = {
 }
 
 type StoreData = {
-  // TODO: Does this violate the requirements? I want to cache the state of the world
   tiles: Record<string, TileData>;
   reload(loader: (slug: string, url?: string | null) => Promise<{ next: string | null; results: TileData[] }>): Promise<void>;
   update(state: TileState.Flag | TileState.Shown, x: number, y: number): Promise<void>;
@@ -73,7 +72,7 @@ export function createWorldStore(
         } else if (tile.state === TileState.Shown) {
           state.cleared++;
 
-          // TODO: Can this be cheated? The backend is still the source of truth
+          // TODO: (stability, fix) Can this be cheated? The backend is still the source of truth
           if ((state.cleared + state.mine_count) >= state.width * state.height) {
             state.state = WorldState.Won;
           }

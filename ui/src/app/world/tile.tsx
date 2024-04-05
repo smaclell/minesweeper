@@ -15,7 +15,7 @@ const lookup: Record<number, { className: string; content: string }> = {
     className: 'flag',
     content: '🚩',
   },
-  // TODO: Reveal all mines after a win/loss
+  // TODO: (scope) Reveal all mines after a win/loss
   /*
   [TileState.Mine]: {
     className: '',
@@ -32,7 +32,7 @@ export default React.memo(function Tile({
   data,
   x,
   y,
-  onClick // TODO: Clicks
+  onClick
 }: {
   data: TileData | undefined;
   x: number;
@@ -41,7 +41,7 @@ export default React.memo(function Tile({
 }) {
   const clicking = useRef(false);
 
-  // TODO: Accessibilty
+  // TODO: (scope) Ensure tiles are accessible
   const state = data?.state ?? TileState.Hidden;
   const { className, content } = lookup[state];
 

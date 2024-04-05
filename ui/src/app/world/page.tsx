@@ -19,7 +19,7 @@ function WorldView({ world }: { world: WorldData }) {
   // Memoize and pass it down
   const { tiles, update } = useStore(store);
 
-  // TODO: Fix the routes
+  // TODO: (scope) update to have simple clean routes
 
   const { positions, style } = useMemo(() => {
     const style: React.CSSProperties = {
@@ -77,7 +77,7 @@ export default function WorldPage() {
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('slug');
     if (!slug || !/^[a-z]+-[a-z]+-[a-z]+$/.test(slug)) {
-      // TODO: Throw/go back to the main page
+      // TODO: (fix) Throw/go back to the main page
       throw new Error('bad slug doug')
     }
 
