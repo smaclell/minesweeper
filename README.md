@@ -24,7 +24,9 @@ My top priories would be:
 
 ## Running the code
 
-First, run the backend:
+Ensure you have at least Node 18 and Python 3.11 locally.
+
+Next, run the backend:
 
 ```bash
 pip install pipenv
