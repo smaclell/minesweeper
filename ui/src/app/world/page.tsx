@@ -79,11 +79,9 @@ export default function WorldPage() {
     }
   }, [setWorld]);
 
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center flex flex-col justify-center font-mono text-sm">
-        {world? <WorldView world={world} /> : <LoadingView />}
-      </div>
-    </main>
-  );
+  if (world) {
+    return <WorldView world={world} />;
+  } else {
+    return <LoadingView />;
+  }
 }
