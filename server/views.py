@@ -72,9 +72,9 @@ class TileList(APIView):
         if world == None:
             raise Http404
 
-        queryset = Tile.objects.filter(world=world).filter(
-            Q(state=TileState.SHOWN) | Q(state=TileState.EXPLOSION)
-        )
+        filter = Q(state=TileState.SHOWN) | Q(
+            state=TileState.EXPLOSION) | Q(state=TileState.FLAG)
+        queryset = Tile.objects.filter(world=world).filter(filter)
 
         paginator = CursorPagination()
         paginator.ordering = 'id'
@@ -116,7 +116,7 @@ class TileList(APIView):
 
             shown = False
             if tile == None:
-                shown = True
+                shown = state == TileState.SHOWN
                 tile = Tile(
                     world=world,
                     x=x,
@@ -130,6 +130,7 @@ class TileList(APIView):
                 tile.state = state
                 shown = state == TileState.SHOWN
 
+            # TODO: Add more tests around this state to ensure cleared only changes when expected
             if shown:
                 world.cleared += 1
                 if (world.cleared + world.mine_count) >= (world.width * world.height):

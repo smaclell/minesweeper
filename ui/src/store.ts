@@ -98,19 +98,21 @@ export function createWorldStore(
           return;
         };
 
-        update(TileState.Shown, x, y);
+        return update(TileState.Shown, x, y);
       }
 
-      check(x - 1, y - 1);
-      check(x - 1, y);
-      check(x - 1, y + 1);
+      await Promise.allSettled([
+        check(x - 1, y - 1),
+        check(x - 1, y),
+        check(x - 1, y + 1),
 
-      check(x, y - 1);
-      check(x, y + 1);
+        check(x, y - 1),
+        check(x, y + 1),
 
-      check(x + 1, y + 1);
-      check(x + 1, y);
-      check(x + 1, y + 1);
+        check(x + 1, y + 1),
+        check(x + 1, y),
+        check(x + 1, y + 1),
+      ]);
     }
   }));
 
