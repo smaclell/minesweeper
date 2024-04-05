@@ -47,11 +47,11 @@ function WorldView({ world }: { world: WorldData }) {
       <div className="world" style={style}>
         {positions.map(([x, y, key]) => (
           <Tile
-          key={key}
-          x={x}
-          y={y}
-          data={tiles[key]}
-          onClick={update}
+            key={key}
+            x={x}
+            y={y}
+            data={tiles[key]}
+            onClick={update}
           />
         ))}
       </div>
@@ -63,7 +63,7 @@ function WorldView({ world }: { world: WorldData }) {
         {state === WorldState.Playing ? (
           <>
             <p>Click to show a cell.</p>
-            <p>Right click to place a 🚩.</p>
+            <p>Right click to 🚩 cells.</p>
             <p>Good luck!</p>
           </>
         ) : null}
