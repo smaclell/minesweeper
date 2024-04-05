@@ -41,6 +41,9 @@ function WorldView({ world }: { world: WorldData }) {
 
   return (
     <div>
+      <div className="my-2">
+        <a href="/">← go back</a>
+      </div>
       <div className="world" style={style}>
         {positions.map(([x, y, key]) => (
           <Tile
@@ -52,11 +55,11 @@ function WorldView({ world }: { world: WorldData }) {
           />
         ))}
       </div>
-      <div className="mt-5">
+      <div className="my-4">
         <p>Cleared: {cleared}</p>
         <p>Mines: {mine_count}</p>
       </div>
-      <div className="text-lg mt-5">
+      <div className="text-lg my-4">
         {state === WorldState.Playing ? (
           <>
             <p>Click to show a cell.</p>
@@ -84,8 +87,8 @@ export default function WorldPage() {
     const params = new URLSearchParams(window.location.search);
     const slug = params.get('slug');
     if (!slug || !/^[a-z]+-[a-z]+-[a-z]+$/.test(slug)) {
-      // TODO: (fix) Throw/go back to the main page
-      throw new Error('bad slug doug')
+      window.location.href = '/';
+      return;
     }
 
     let accept = true;
