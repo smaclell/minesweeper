@@ -1,6 +1,8 @@
 import React, { MouseEvent, useCallback, useRef } from 'react';
+import { useShallow } from 'zustand/react/shallow';
+import { useStore } from 'zustand';
 import clsx from 'clsx';
-import { TileData, TileState } from '@/store';
+import { Store, TileState } from '@/store';
 
 const lookup: Record<number, { className: string; content: string }> = {
   [TileState.Hidden]: {
@@ -29,16 +31,23 @@ const lookup: Record<number, { className: string; content: string }> = {
 };
 
 export default React.memo(function Tile({
-  data,
   x,
   y,
-  onClick
+  store
 }: {
-  data: TileData | undefined;
   x: number;
   y: number;
-  onClick: (state: TileState.Flag | TileState.Shown, x: number, y: number) => Promise<void>;
+  store: Store,
 }) {
+
+  const { data, update } = useStore(
+    store,
+    useShallow((state) => ({
+      data: state.tiles[`${x},${y}`],
+      update: state.update,
+    })),
+  );
+
   const clicking = useRef(false);
 
   // TODO: (scope) Ensure tiles are accessible
@@ -51,7 +60,7 @@ export default React.memo(function Tile({
     inside = !data ? ':(' : count > 0 ? count.toString() : '';
   }
 
-  const innerOnClick = useCallback(async (e: MouseEvent) => {
+  const onClick = useCallback(async (e: MouseEvent) => {
     const state = e.type === 'contextmenu' || e.shiftKey || e.ctrlKey ? TileState.Flag : TileState.Shown;
     e.preventDefault();
 
@@ -61,19 +70,19 @@ export default React.memo(function Tile({
 
     clicking.current = true;
     try {
-      onClick(state, x, y);
+      update(state, x, y);
     } finally {
       clicking.current = false;
     }
-  }, [onClick, x, y]);
+  }, [update, x, y]);
 
   return (
     <div
       className={clsx('tile', className)}
       data-x={x} data-y={y}
       data-count={state === TileState.Shown ? count : undefined}
-      onClick={innerOnClick}
-      onContextMenu={innerOnClick}
+      onClick={onClick}
+      onContextMenu={onClick}
     >
       {inside}
     </div>

@@ -36,7 +36,7 @@ body {
 /* Source: https://www.color-hex.com/color-palette/100312 */
 
 /* Additional styling to size the grid is applied inline */
-.world {
+.game {
   display: grid;
   place-items: center;
 
@@ -90,6 +90,7 @@ body {
   color: #A4FF00;
 }
 
+/* TODO: (scope) replace the loading text with a cool pulsating loading grid */
 .skeleton {
   animation: fadeOut ease-in-out 10s alternate-reverse infinite;
   opacity: 1;

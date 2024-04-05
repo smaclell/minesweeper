@@ -23,8 +23,8 @@ export async function createWorld(width: number, height: number, mines: number):
     mine_count: mines,
   };
 
-  if (window.URLSearchParams) {
-    const search = new window.URLSearchParams(window.location.search);
+  if (process.env.NODE_ENV === 'development') {
+    const search = new URLSearchParams(window.location.search);
     const debug_flags = search.get('debug_flags');
     if (debug_flags) {
       body.debug_flags = debug_flags;
