@@ -8,7 +8,7 @@ import Tile from './tile';
 
 function WorldView({ world }: { world: WorldData }) {
   const store = useMemo(() => {
-    return createWorldStore(updateTile, world);
+    return createWorldStore(() => loadWorld(world.slug), updateTile, world);
   }, [world]);
 
   useEffect(() => {
@@ -16,8 +16,8 @@ function WorldView({ world }: { world: WorldData }) {
     reload(loadTiles)
   }, [store]);
 
-  // Memoize and pass it down
-  const { tiles, update } = useStore(store);
+  // TODO: (fix) Memoize and pass it down
+  const { state, cleared, mine_count, tiles, update } = useStore(store);
 
   // TODO: (scope) update to have simple clean routes
 
@@ -41,24 +41,31 @@ function WorldView({ world }: { world: WorldData }) {
 
   return (
     <div>
-      <div>
-        <h1>{world?.slug}</h1>
-        <p>Cleared: {world.cleared}</p>
-        <p>Mines: {world.mine_count}</p>
-
-        {world.state === WorldState.Won ? (<p className="text-lg">🎉🎉🎉 You Won! 🎉🎉🎉</p>) : null}
-        {world.state === WorldState.Lost ? (<p className="text-lg">🔥🔥🔥 You Lost! 🔥🔥🔥</p>) : null}
-      </div>
       <div className="world" style={style}>
         {positions.map(([x, y, key]) => (
           <Tile
-            key={key}
-            x={x}
-            y={y}
-            data={tiles[key]}
-            onClick={update}
+          key={key}
+          x={x}
+          y={y}
+          data={tiles[key]}
+          onClick={update}
           />
         ))}
+      </div>
+      <div className="mt-5">
+        <p>Cleared: {cleared}</p>
+        <p>Mines: {mine_count}</p>
+      </div>
+      <div className="text-lg mt-5">
+        {state === WorldState.Playing ? (
+          <>
+            <p>Click to show a cell.</p>
+            <p>Right click to place a 🚩.</p>
+            <p>Good luck!</p>
+          </>
+        ) : null}
+        {state === WorldState.Won ? (<p>🎉🎉🎉 You Won! 🎉🎉🎉</p>) : null}
+        {state === WorldState.Lost ? (<p>🔥🔥🔥 You Lost! 🔥🔥🔥</p>) : null}
       </div>
     </div>
   )
