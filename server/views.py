@@ -124,14 +124,17 @@ class TileList(APIView):
                     y=y,
                     state=state,
                 )
+
             elif tile.has_mine and state == TileState.SHOWN:
                 tile.state = TileState.EXPLOSION
                 world.state = WorldState.LOST
 
-            # TODO: (fix) Allow unflagging
             elif tile.state == TileState.HIDDEN or tile.state == TileState.FLAG:
-                tile.state = state
-                shown = state == TileState.SHOWN
+                if state == TileState.SHOWN:
+                    tile.state = state
+                    shown = True
+                else:
+                    tile.state = TileState.FLAG if tile.state == TileState.HIDDEN else TileState.HIDDEN
 
             # TODO: (fix) Ensure you can win or lose
             # TODO: (scope) Add more tests around this state to ensure cleared only changes when expected

@@ -212,6 +212,32 @@ class TileListTestCase(TestCase):
         updated_world = World.objects.get(id=self.world.id)
         self.assertEqual(updated_world.cleared, self.world.cleared + 1)
 
+    def test_flagging_then_showing(self):
+        response = self.client.post('/api/worlds/test-basic-tiles/tiles/', {
+            'x': 1,
+            'y': 2,
+            'state': TileState.FLAG,
+        }, format='json')
+
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.data['state'], TileState.FLAG)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual('has_mine' in response.data, False)
+
+        response = self.client.post('/api/worlds/test-basic-tiles/tiles/', {
+            'x': 1,
+            'y': 2,
+            'state': TileState.FLAG,
+        }, format='json')
+
+        self.assertEqual(response.status_code, 202)
+        self.assertEqual(response.data['state'], TileState.SHOWN)
+        self.assertEqual(response.data['count'], 2)
+        self.assertEqual('has_mine' in response.data, False)
+
+        updated_world = World.objects.get(id=self.world.id)
+        self.assertEqual(updated_world.cleared, self.world.cleared)
+
     def test_flagging_a_mine(self):
         response = self.client.post('/api/worlds/test-basic-tiles/tiles/', {
             'x': 1,
