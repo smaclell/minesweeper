@@ -40,7 +40,7 @@ class ListGenerator(Generator):
     def __init__(self, points: list[Point]):
         self.points = points
 
-    def generate_point(self, world: World) -> list[Point]:
+    def generate_point(self, world: World) -> Point:
         return self.points.pop()
 
 

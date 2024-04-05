@@ -31,13 +31,10 @@ class WorldList(APIView):
         debug_flags = request.data.get('debug_flags', '')
         generator = RandomGenerator()
         if debug_flags == 'simple':
-            generator = ListGenerator(
-                [
-                    Point(0, 0),
-                    Point(1, 1),
-                    Point(0, 2),
-                ]
-            )
+            mines = [Point(0, 0), Point(1, 1), Point(0, 2)]
+            generator = ListGenerator(mines)
+            world.mine_count = len(mines)
+            world.save()
 
         with transaction.atomic():
             setup_mines(world, generator)

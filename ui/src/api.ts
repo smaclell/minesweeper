@@ -25,7 +25,7 @@ export async function createWorld(width: number, height: number, mines: number):
 
   if (window.URLSearchParams) {
     const search = new window.URLSearchParams(window.location.search);
-    const debug_flags = search.get('debug');
+    const debug_flags = search.get('debug_flags');
     if (debug_flags) {
       body.debug_flags = debug_flags;
     }
