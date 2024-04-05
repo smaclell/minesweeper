@@ -98,21 +98,23 @@ export async function loadTiles(slug: string, url: string | null = 'initial'): P
 }
 
 export async function updateTile(state: TileState.Flag | TileState.Shown, slug: string, x: number, y: number): Promise<TileData | undefined> {
-  const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/worlds/${slug}/tiles/`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ state, x, y })
-  });
+  for (let retries = 5; retries > 0; retries--) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}/api/worlds/${slug}/tiles/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ state, x, y })
+    });
 
-  if (response.ok) {
-    const tile = response.json();
-    return tile;
-  }
+    if (response.ok) {
+      const tile = response.json();
+      return tile;
+    }
 
-  if (response.status === 404) {
-    return undefined;
+    if (response.status === 404) {
+      return undefined;
+    }
   }
 
   throw new Error('Failed to update tile');
