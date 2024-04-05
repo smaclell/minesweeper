@@ -91,21 +91,21 @@ class TileList(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        try:
-            world = World.objects.get(slug=slug)
-        except World.DoesNotExist:
-            world = None
-
-        # TODO: (learning) Can this use the serializer to access fields? Can we consolidate the validation against the world?
-        x = request.data['x']
-        y = request.data['y']
-        state = request.data['state']
-
-        if world == None or world.state != WorldState.PLAYING or x < 0 or y < 0 or x >= world.width or y >= world.height:
-            raise Http404
-
         # TODO: (fix) ensure postgres does not fail
         with transaction.atomic():
+            try:
+                world = World.objects.get(slug=slug)
+            except World.DoesNotExist:
+                world = None
+
+            # TODO: (learning) Can this use the serializer to access fields? Can we consolidate the validation against the world?
+            x = request.data['x']
+            y = request.data['y']
+            state = request.data['state']
+
+            if world == None or world.state != WorldState.PLAYING or x < 0 or y < 0 or x >= world.width or y >= world.height:
+                raise Http404
+
             tile = Tile.objects.filter(
                 world=world,
                 x=x,
@@ -133,7 +133,6 @@ class TileList(APIView):
                 else:
                     tile.state = TileState.FLAG if tile.state == TileState.HIDDEN else TileState.HIDDEN
 
-            # TODO: (fix) Ensure you can win or lose
             # TODO: (scope) Add more tests around this state to ensure cleared only changes when expected
             if shown:
                 world.cleared += 1
