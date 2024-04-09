@@ -57,25 +57,41 @@ export function createWorldStore(
     };
 
     // Only expand if there are no nearby mines, stop at the edges or if already shown
-    const autoExpand = async (tile: TileData) => {
+    const expansion = new Map<string, { x: number; y: number }>();
+    const autoExpand = async (tile: TileData, rootUpdate: boolean) => {
       const expand = tile.state === TileState.Shown && tile.count === 0;
       if (!expand) {
         return;
       }
 
       const { x, y } = tile;
-      await Promise.allSettled([
-        check(x - 1, y - 1),
-        check(x - 1, y),
-        check(x - 1, y + 1),
+      check(x - 1, y - 1);
+      check(x - 1, y);
+      check(x - 1, y + 1);
 
-        check(x, y - 1),
-        check(x, y + 1),
+      check(x, y - 1);
+      check(x, y + 1);
 
-        check(x + 1, y - 1),
-        check(x + 1, y),
-        check(x + 1, y + 1),
-      ]);
+      check(x + 1, y - 1);
+      check(x + 1, y);
+      check(x + 1, y + 1);
+
+      if (!rootUpdate) {
+        return;
+      }
+
+      while (expansion.size > 0) {
+        const promises: Promise<void>[] = [];
+        const values = Array.from(expansion.values());
+        values.forEach(({ x, y }) => {
+          promises.push(innerUpdate(TileState.Shown, x, y, false));
+        });
+
+        await Promise.allSettled(promises);
+        values.forEach(({ x, y }) => {
+          expansion.delete(`${x},${y}`);
+        });
+      }
     }
 
     const check = (x: number, y: number) => {
@@ -83,11 +99,12 @@ export function createWorldStore(
         return;
       }
 
-      if (`${x},${y}` in get().tiles) {
+      const key = `${x},${y}`;
+      if (key in get().tiles || expansion.has(key)) {
         return;
       };
 
-      return innerUpdate(TileState.Shown, x, y, false);
+      expansion.set(key, { x, y });
     };
 
     const innerUpdate = async (state: TileState.Flag | TileState.Shown, x: number, y: number, rootUpdate: boolean) => {
@@ -100,7 +117,7 @@ export function createWorldStore(
           state.tiles[`${x},${y}`] = tile;
         }));
 
-        await autoExpand(tile);
+        await autoExpand(tile, rootUpdate);
         if (rootUpdate) {
           await refreshWorld();
         }
