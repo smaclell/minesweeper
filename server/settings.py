@@ -143,6 +143,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
 ] if DEBUG else []
 
+if 'CORS_HOST' in os.environ:
+    CORS_ALLOWED_ORIGINS.append(os.environ['CORS_HOST'])
+
 REST_FRAMEWORK = {
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.CursorPagination',
     'PAGE_SIZE': 10
