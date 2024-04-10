@@ -18,15 +18,16 @@ There is so much more I would like to learn and do! Check out the different `TOD
 
 My top priories would be:
 
-* Switching to a more robust database to improve performance/interactivity (currently hacking around sqlite heavily locking the database, check out the experimental-postgres for my attempt at it)
 * Making the "clearing" smoother to ensure it does not block user interactions
 * Change serving pages so the routes could be /world/cool-unique-slug instead of /world?slug=okay-i-guess
 
 ## Running the code
 
-Ensure you have at least Node 18 and Python 3.11 locally.
+The easiest way to run the application us using `docker compose up`.
 
-Next, run the backend:
+You can also run it outside of docker with Node 18 and Python 3.11.
+
+First, run the backend:
 
 ```bash
 pip install pipenv
